@@ -1,20 +1,22 @@
 {
-  "name": "astrovista-instagram",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "dotenv": "^16.5.0",
-    "fs": "^0.0.1-security",
-    "instagram-private-api": "^1.46.1",
-    "mongodb": "^6.15.0",
-    "node-cron": "^3.0.3",
-    "node-fetch": "^3.3.2"
-  }
+	"name": "astrovista-instagram",
+	"version": "1.0.0",
+	"main": "bot.js",
+	"type": "module",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "node bot.js"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"description": "",
+	"dependencies": {
+		"dotenv": "^16.5.0",
+		"fs": "^0.0.1-security",
+		"instagram-private-api": "^1.46.1",
+		"mongodb": "^6.15.0",
+		"node-cron": "^3.0.3",
+		"node-fetch": "^3.3.2"
+	}
 }
