@@ -55,11 +55,4 @@ async function runBot() {
 	console.log("Image successfully posted.")
 }
 
-// Agendar para 08:00 todos os dias
-cron.schedule("0 8 * * *", () => {
-	runBot()
-})
-
-console.log("Bot iniciado e agendado para 08:00 diariamente.")
-
 module.exports = { runBot }
