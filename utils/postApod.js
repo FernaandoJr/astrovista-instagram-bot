@@ -1,20 +1,21 @@
 require("dotenv").config()
-const { postImage } = require("./instagram")
+const { postImage } = require("../instagram")
 const fetch = (...args) =>
 	import("node-fetch").then((mod) => mod.default(...args))
 const fs = require("fs")
 const path = require("path")
-const { markDateAsPosted } = require("./mongo")
+const { markDateAsPosted } = require("../services/mongo")
 
 async function downloadImage(url, filename) {
 	const res = await fetch(url)
 	const buffer = await res.buffer()
-	const fullPath = path.join(__dirname, "images", filename)
+	const fullPath = path.join(__dirname, "../images", filename)
 	fs.writeFileSync(fullPath, buffer)
 	return fullPath
 }
 
 async function postPhoto(apod) {
+	console.log("Posting APOD...")
 	const imageUrl = apod.hdurl || apod.url
 	const filename = `${apod.date}.jpg`
 	const imagePath = await downloadImage(imageUrl, filename)

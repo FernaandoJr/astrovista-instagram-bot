@@ -5,10 +5,10 @@ const { log } = require("console")
 
 async function login() {
 	const ig = new IgApiClient()
-	console.log(process.env.IG_USERNAME, process.env.IG_PASSWORD)
+	console.log("Logging in to Instagram...")
 	ig.state.generateDevice(process.env.IG_USERNAME)
 	await ig.account.login(process.env.IG_USERNAME, process.env.IG_PASSWORD)
-	console.log("Login realizado com sucesso.")
+	console.log("Logged in to Instagram")
 	return ig
 }
 

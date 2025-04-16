@@ -4,13 +4,13 @@ const {
 	isDatePosted,
 	getApod,
 	markDateAsPosted,
-} = require("./mongo")
-const { postImage } = require("./instagram")
+} = require("../services/mongo")
+const { postImage } = require("../instagram")
 const fetch = (...args) =>
 	import("node-fetch").then((mod) => mod.default(...args))
 const fs = require("fs")
 const path = require("path")
-const { postPhoto } = require("./post-photo")
+const { postPhoto } = require("./postApod")
 
 async function getRandomDate() {
 	const start = new Date(1995, 5, 16)
@@ -18,8 +18,6 @@ async function getRandomDate() {
 		const dateParts = apod.date.split("-") // Split the date string (YYYY-MM-DD)
 		return new Date(dateParts[0], dateParts[1] - 1, dateParts[2]) // Return a Date object
 	})
-
-	console.log(start, end)
 
 	while (true) {
 		const randomDate = new Date(
@@ -43,7 +41,7 @@ async function postRandomApod() {
 		apod = await getApod(date)
 
 		if (apod.media_type !== "image") {
-			console.log("O APOD não é uma imagem.")
+			console.log("APOD is not an image. Trying again...")
 			continue
 		}
 		console.log("APOD:", apod)
