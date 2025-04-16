@@ -1,11 +1,12 @@
 require("dotenv").config()
-const { getApodOfToday } = require("./mongo")
+const { getApodOfToday, randomApod, isDatePosted } = require("./mongo")
 const { postImage } = require("./instagram")
 const fetch = (...args) =>
 	import("node-fetch").then((mod) => mod.default(...args))
 const fs = require("fs")
 const path = require("path")
 const cron = require("node-cron")
+const { postPhoto } = require("./post-photo")
 
 async function downloadImage(url, filename) {
 	const res = await fetch(url)
@@ -27,32 +28,13 @@ async function runBot() {
 		return
 	}
 
-	const imageUrl = apod.hdurl || apod.url
-	const filename = `${apod.date}.jpg`
-	const imagePath = await downloadImage(imageUrl, filename)
+	const alreadyPosted = await isDatePosted(apod.date)
+	if (alreadyPosted) {
+		console.log("APOD já postado.")
+		return
+	}
 
-	// Format the date to include the month name, treating it as a local date
-	const dateParts = apod.date.split("-") // Split the date string (YYYY-MM-DD)
-	const dateObj = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]) // Create a local date
-	const formattedDate = dateObj.toLocaleDateString("en-US", {
-		year: "numeric",
-		month: "long",
-		day: "numeric",
-	})
-
-	// Improved Instagram-like caption in English
-	let caption = `🪐 ${apod.title} 🌌\n\n`
-	caption += `📅 Date: ${formattedDate}\n\n`
-	caption += `📸 Explanation: ${apod.explanation}\n\n`
-	caption = caption.slice(0, 2000) // Instagram caption limit
-	if (caption.length > 2000) caption = caption.slice(0, 100) + "..."
-	if (apod.copyright) caption += `📸 Credit: ${apod.copyright}\n\n`
-	caption += `Follow @astrovista.app for more amazing space content!\n\n`
-
-	caption += `#Astronomy #NASA #Astrophotography #Space #APOD #AstronomyPictureOfTheDay #Cosmos #Universe #Science #Nature #Stargazing #AstroPhotography #NASAAPOD #SpaceLovers #ExploreTheUniverse #AstroArt #AstronomyLovers #Astrophysics #CosmicWonder #CelestialBeauty #StellarWonders #GalacticJourney #AstronomyCommunity #SpaceExploration #AstroInspiration`
-
-	await postImage(imagePath, caption)
-	console.log("Image successfully posted.")
+	postPhoto(apod)
 }
 
 module.exports = { runBot }
