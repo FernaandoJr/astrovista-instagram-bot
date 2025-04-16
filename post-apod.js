@@ -6,3 +6,4 @@ const { postRandomApod } = require("./randomApod")
 runBot()
 postRandomApod()
 console.log("Bot started.")
+//asd
