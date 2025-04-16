@@ -4,7 +4,7 @@ const cron = require("node-cron")
 const { postRandomApod } = require("./utils/postRandomApod")
 
 // Cron job to post a random APOD every hour - 0 * * * *
-cron.schedule("0 * * * *", async () => {
+cron.schedule("20 * * * *", async () => {
 	console.log("Posting random APOD...")
 	await postRandomApod()
 })
@@ -15,4 +15,5 @@ cron.schedule("0 11 * * *", async () => {
 	await postLatestApod()
 })
 
+// postRandomApod()
 console.log("Bot started.")

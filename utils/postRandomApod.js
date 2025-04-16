@@ -44,7 +44,7 @@ async function postRandomApod() {
 			console.log("APOD is not an image. Trying again...")
 			continue
 		}
-		console.log("APOD:", apod)
+		console.log("APOD:", JSON.stringify(apod))
 		break
 	}
 	postPhoto(apod)

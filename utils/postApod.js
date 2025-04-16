@@ -4,13 +4,27 @@ const fetch = (...args) =>
 	import("node-fetch").then((mod) => mod.default(...args))
 const fs = require("fs")
 const path = require("path")
+const sharp = require("sharp")
 const { markDateAsPosted } = require("../services/mongo")
 
 async function downloadImage(url, filename) {
 	const res = await fetch(url)
 	const buffer = await res.buffer()
-	const fullPath = path.join(__dirname, "../images", filename)
-	fs.writeFileSync(fullPath, buffer)
+
+	console.log("Image downloaded and resized:", filename)
+
+	// Converter para JPEG
+	const fullPath = path.join(
+		__dirname,
+		"../images",
+		filename.replace(".png", ".jpg")
+	)
+
+	await sharp(buffer)
+		.resize(1080, 1080, { fit: "inside" }) // manter proporção
+		.jpeg({ quality: 90 })
+		.toFile(fullPath)
+
 	return fullPath
 }
 
@@ -31,8 +45,9 @@ async function postPhoto(apod) {
 
 	// Remove all \n characters from explanation and copyright
 	const cleanExplanation = apod.explanation.replace(/\n/g, " ")
+
 	const cleanCopyright = apod.copyright
-		? apod.copyright.replace(/\n/g, " ")
+		? apod.copyright.replace(/\n/g, " ").replace(/�/g, "")
 		: ""
 
 	// Improved Instagram-like caption in English
