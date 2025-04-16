@@ -8,12 +8,26 @@ const sharp = require("sharp")
 const { markDateAsPosted } = require("../services/mongo")
 
 async function downloadImage(url, filename) {
+	// Check if the file extension is valid
+	const validExtensions = [".jpg", ".jpeg", ".png"]
+	const fileExtension = path.extname(url).toLowerCase()
+
+	console.log("File extension:", fileExtension)
+
+	if (!validExtensions.includes(fileExtension)) {
+		throw new Error(
+			`Invalid image format: ${fileExtension}. Supported formats are ${validExtensions.join(
+				", "
+			)}`
+		)
+	}
+
 	const res = await fetch(url)
 	const buffer = await res.buffer()
 
 	console.log("Image downloaded and resized:", filename)
 
-	// Converter para JPEG
+	// Convert to JPEG
 	const fullPath = path.join(
 		__dirname,
 		"../images",
@@ -21,9 +35,11 @@ async function downloadImage(url, filename) {
 	)
 
 	await sharp(buffer)
-		.resize(1080, 1080, { fit: "inside" }) // manter proporção
+		.resize(1080, 1080, { fit: "inside" }) // Maintain aspect ratio
 		.jpeg({ quality: 90 })
 		.toFile(fullPath)
+
+	console.log("Image resized and saved:", fullPath)
 
 	return fullPath
 }
