@@ -11,6 +11,7 @@ const fetch = (...args) =>
 const fs = require("fs")
 const path = require("path")
 const { postPhoto } = require("./postApod")
+const { logMessage } = require("./logMessage")
 
 async function getRandomDate() {
 	const start = new Date(1995, 5, 16)
@@ -36,15 +37,16 @@ async function postRandomApod() {
 	let apod
 	while (true) {
 		date = await getRandomDate()
-		console.log("Random date:", date)
+		logMessage(`Trying to get APOD for ${date}`, "INFO")
 
 		apod = await getApod(date)
 
 		if (apod.media_type !== "image") {
-			console.log("APOD is not an image. Trying again...")
+			logMessage(`APOD is not an image. Trying again...`, "INFO")
 			continue
 		}
 		console.log("APOD:", JSON.stringify(apod))
+		logMessage(`APOD: ${JSON.stringify(apod)}`, "INFO")
 		break
 	}
 	postPhoto(apod)

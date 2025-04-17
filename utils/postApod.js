@@ -1,51 +1,11 @@
 require("dotenv").config()
 const { postImage } = require("../instagram")
-const fetch = (...args) =>
-	import("node-fetch").then((mod) => mod.default(...args))
-const fs = require("fs")
-const path = require("path")
-const sharp = require("sharp")
+const { downloadImage } = require("./downloadImage")
 const { markDateAsPosted } = require("../services/mongo")
-
-async function downloadImage(url, filename) {
-	// Check if the file extension is valid
-	const validExtensions = [".jpg", ".jpeg", ".png"]
-	const fileExtension = path.extname(url).toLowerCase()
-
-	console.log("File extension:", fileExtension)
-
-	if (!validExtensions.includes(fileExtension)) {
-		throw new Error(
-			`Invalid image format: ${fileExtension}. Supported formats are ${validExtensions.join(
-				", "
-			)}`
-		)
-	}
-
-	const res = await fetch(url)
-	const buffer = await res.buffer()
-
-	console.log("Image downloaded and resized:", filename)
-
-	// Convert to JPEG
-	const fullPath = path.join(
-		__dirname,
-		"../images",
-		filename.replace(".png", ".jpg")
-	)
-
-	await sharp(buffer)
-		.resize(1080, 1080, { fit: "inside" }) // Maintain aspect ratio
-		.jpeg({ quality: 90 })
-		.toFile(fullPath)
-
-	console.log("Image resized and saved:", fullPath)
-
-	return fullPath
-}
+const { logMessage } = require("./logMessage")
 
 async function postPhoto(apod) {
-	console.log("Posting APOD...")
+	logMessage(`Posting APOD...`, "INFO")
 	const imageUrl = apod.hdurl || apod.url
 	const filename = `${apod.date}.jpg`
 	const imagePath = await downloadImage(imageUrl, filename)
@@ -60,14 +20,15 @@ async function postPhoto(apod) {
 	})
 
 	// Remove all \n characters from explanation and copyright
-	const cleanExplanation = apod.explanation.replace(/\n/g, " ")
-
+	const cleanExplanation = apod.explanation
+		.replace(/\n/g, " ")
+		.replace(/�/g, "")
 	const cleanCopyright = apod.copyright
 		? apod.copyright.replace(/\n/g, " ").replace(/�/g, "")
 		: ""
 
 	// Improved Instagram-like caption in English
-	let caption = `🪐 ${apod.title} 🌌\n\n`
+	let caption = `🪐 ${apod.title} ✨\n\n`
 	caption += `📅 Date: ${formattedDate}\n\n`
 	caption += `📸 Explanation: ${cleanExplanation}\n\n`
 	caption = caption.slice(0, 2000) // Instagram caption limit
@@ -75,13 +36,13 @@ async function postPhoto(apod) {
 	if (cleanCopyright) caption += `📸 Credit: ${cleanCopyright}\n\n`
 	caption += `Follow @astrovista.app for more amazing space content! Or visit our website, link in bio 🔗\n\n`
 
-	caption += `#Astronomy #NASA #Astrophotography #Space #APOD #AstronomyPictureOfTheDay #Cosmos #Universe #Science #Nature #Stargazing #AstroPhotography #NASAAPOD #SpaceLovers #ExploreTheUniverse #AstroArt #AstronomyLovers #Astrophysics #CosmicWonder #CelestialBeauty #StellarWonders #GalacticJourney #AstronomyCommunity #SpaceExploration #AstroInspiration`
+	caption += `#Astronomy #NASA #Astrophotography #Space #APOD #AstronomyPictureOfTheDay #Cosmos #Universe #Science #Nature #Stargazing #AstroPhotography #NASAAPOD #SpaceLovers #ExploreTheUniverse #AstroArt #AstronomyLovers #Astrophysics #CosmicWonder #CelestialBeauty #StellarWonders #GalacticJourney #AstronomyCommunity #SpaceExploration #AstroInspiration #AstroVista #AstroVistaApp #AstroVistaCommunity`
 
 	await postImage(imagePath, caption)
-	console.log("Image successfully posted.")
+	logMessage(`Image posted successfully!`, "SUCCESS")
 
 	markDateAsPosted(apod.date)
-	console.log("Date marked as posted:", apod.date)
+	logMessage(`Date marked as posted: ${apod.date}`, "SUCCESS")
 }
 
 module.exports = { postPhoto }

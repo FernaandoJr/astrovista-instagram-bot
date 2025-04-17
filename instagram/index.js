@@ -2,13 +2,14 @@ const { IgApiClient } = require("instagram-private-api")
 const fs = require("fs")
 const path = require("path")
 const { log } = require("console")
+const { logMessage } = require("../utils/logMessage")
 
 async function login() {
 	const ig = new IgApiClient()
-	console.log("Logging in to Instagram...")
+	logMessage("Logging in to Instagram...", "INFO")
 	ig.state.generateDevice(process.env.IG_USERNAME)
 	await ig.account.login(process.env.IG_USERNAME, process.env.IG_PASSWORD)
-	console.log("Logged in to Instagram")
+	logMessage("Logged in to Instagram", "SUCCESS")
 	return ig
 }
 
